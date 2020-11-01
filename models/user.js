@@ -26,15 +26,25 @@ module.exports = (mongoose, bcrypt) => {
 		],
 	});
 	userSchema.pre('save', function (next) {
-		bcrypt.getSalt(saltRounds, (err, salt) => {
+		if (!this.isModified('password')) {
+			next();
+			return;
+		}
+
+		bcrypt.genSalt(saltRounds, (err, salt) => {
 			if (err) {
 				next(err);
 				return;
 			}
+
 			bcrypt.hash(this.password, salt, (err, hash) => {
 				if (err) {
-					
+					next(err);
+					return;
 				}
+
+				this.password = hash;
+				next();
 			});
 		});
 	});
