@@ -1,23 +1,25 @@
-const express = require('express');
 const handlebars = require('express-handlebars');
 const cookieParser = require('cookie-parser');
+const path = require('path');
+const { auth } = require('../utils');
 
-module.exports = (app) => {
-	app.use(cookieParser());
+module.exports = (express, app) => {
+	app.use(express.static('public'));
 	app.use(express.json());
 	app.use(express.urlencoded({ extended: false }));
-	//TODO: Setup the view engine
+
+	app.use(cookieParser());
+
+	app.use(auth);
+
 	app.engine(
-		'.hbs',
+		'hbs',
 		handlebars({
 			layoutsDir: 'views',
 			defaultLayout: 'main.hbs',
 			partialsDir: 'views/partials',
-			extname: '.hbs',
+			extname: 'hbs',
 		})
 	);
-	app.set('view engine', '.hbs');
-
-	//TODO: Setup the static files
-	app.use('/static', express.static('static'));
+	app.set('viewengine', 'hbs');
 };

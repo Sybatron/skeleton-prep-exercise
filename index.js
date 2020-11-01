@@ -1,33 +1,14 @@
-const env = process.env.NODE_ENV || 'development';
+const express = require('express');
+const { port } = require('./config');
 
-const config = require('./config/config')[env];
-const app = require('express')();
-const indexRouter = require('./routes');
-const autRouter = require('./routes/auth');
-const mongoose = require('mongoose');
+const app = express();
+const appString = `Server is ready, listening on port: ${port}...`;
 
-mongoose.connect(
-	config.databaseUrl,
-	{
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-		useFindAndModify: false,
-	},
-	(err) => {
-		if (err) {
-			console.error(err);
-			throw err;
-		}
-	}
-);
+require('./config/database')()
+	.then(() => {
+		require('./config/express')(express, app);
+		require('./config/routes')(express, app);
 
-require('./config/express')(app);
-
-app.use('/', autRouter);
-
-app.use('/', indexRouter);
-
-app.listen(
-	config.port,
-	console.log(`Listening on port ${config.port}! Now its up to you...`)
-);
+		app.listen(port, console.log(appString));
+	})
+	.catch((e) => console.log(e));
