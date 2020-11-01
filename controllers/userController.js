@@ -1,6 +1,8 @@
 const { User } = require('../models');
 const { jwt } = require('../utils');
 const { cookie } = require('../config');
+const { response } = require('express');
+const { create } = require('express-handlebars');
 
 module.exports = {
 	get: {
@@ -21,7 +23,27 @@ module.exports = {
 
 	post: {
 		register(req, res, next) {
-			console.log(req.body);
+			const { email, fullName, password } = { ...req.body };
+
+			User.findOne({ email })
+				.then((user) => {
+					if (user) {
+						throw new Error('The given email is already in use...');
+					}
+					return User.create({ email, fullName, password });
+				})
+				.then((createdUser) => {
+					console.log(createdUser);
+				})
+				.catch((e) => {
+					console.log(e);
+				});
+
+			// User.create({ ...req.body })
+			// 	.then((createdUser) => {
+			// 		console.log(createdUser);
+			// 	})
+			// 	.catch((e) => console.log(e));
 		},
 		login(req, res, next) {
 			console.log(req.body);

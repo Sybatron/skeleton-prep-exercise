@@ -1,6 +1,45 @@
-module.exports = () => {
-	const { Schema } = require('mongoose');
-	const userSchema = new Schema();
+const { hash } = require('bcrypt');
+const { saltRounds } = require('../config');
+
+module.exports = (mongoose, bcrypt) => {
+	const { Schema, model: Model } = mongoose;
+	const { String, ObjectId } = Schema.Types;
+
+	const userSchema = new Schema({
+		email: {
+			type: String,
+			required: true,
+			unique: true,
+		},
+		fullname: {
+			type: String,
+		},
+		password: {
+			type: String,
+			required: true,
+		},
+		offersBought: [
+			{
+				type: ObjectId,
+				ref: 'Shoe',
+			},
+		],
+	});
+	userSchema.pre('save', function (next) {
+		bcrypt.getSalt(saltRounds, (err, salt) => {
+			if (err) {
+				next(err);
+				return;
+			}
+			bcrypt.hash(this.password, salt, (err, hash) => {
+				if (err) {
+					
+				}
+			});
+		});
+	});
+
+	return Model('User', userSchema);
 };
 
 // const { saltRounds } = require('../config');
