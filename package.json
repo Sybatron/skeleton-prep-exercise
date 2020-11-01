@@ -1,7 +1,7 @@
 {
-  "name": "cube-workshop",
-  "description": "Cube workshop for SoftUni",
-  "authors": "Deni Marinova",
+  "name": "shoe-shelf",
+  "description": "Exam-prep 1 for Softuni",
+  "authors": "Ivan Petrov",
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
@@ -24,5 +24,13 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sybatron/skeleton-prep-exercise.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sybatron/skeleton-prep-exercise/issues"
+  },
+  "homepage": "https://github.com/Sybatron/skeleton-prep-exercise#readme"
 }
