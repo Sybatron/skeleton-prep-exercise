@@ -1,21 +1,58 @@
-const mongoose = require('mongoose');
-const UserShcema = new mongoose.Schema({
+const { saltRounds } = require('../config');
 
-    username: {
-        type: String,
-        required: true
-    },
+module.exports = (mongoose, bcrypt) => {
+	const { Schema, model: Model } = mongoose;
+	const { String, ObjectId } = Schema.Types;
 
-    password: {
-        type: String,
-        required: true
-    },
+	const userSchema = new Schema({
+		email: {
+			type: String,
+			required: true,
+			unique: true,
+		},
+		fullName: {
+			type: String,
+			required: true,
+		},
+		password: {
+			type: String,
+			required: true,
+		},
+		offersBought: [
+			{
+				type: ObjectId,
+				ref: 'Shoe',
+			},
+		],
+	});
 
-    likedPlays: [{
-        type: 'ObjectId',
-        ref: 'Play'
-    }]
+	userSchema.methods = {
+		comparePasswords(password) {
+			return bcrypt.compare(password, this.password);
+		},
+	};
 
-})
+	userSchema.pre('save', function (next) {
+		if (!this.isModified('password')) {
+			next();
+			return;
+		}
 
-module.exports = mongoose.model('User', UserShcema);
+		bcrypt.genSalt(saltRounds, (err, salt) => {
+			if (err) {
+				next(err);
+				return;
+			}
+			bcrypt.hash(this.password, salt, (err, hash) => {
+				if (err) {
+					next(err);
+					return;
+				}
+				this.password = hash;
+				next();
+			});
+		});
+	});
+
+	return Model('User', userSchema);
+};
